@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Country } from './entity/country.entity';
-import { Repository } from 'typeorm';
+import {Injectable,NotFoundException,} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
+
+import { Country } from './entity/country.entity';
 import { State } from './entity/state.entity';
 import { District } from './entity/district.entity';
 import { PoliceStation } from './entity/police.entity';
@@ -9,38 +11,343 @@ import { Post } from './entity/post.entity';
 
 @Injectable()
 export class AddressService {
-    constructor(
-        @InjectRepository(Country) private countryRepo: Repository<Country>,
-        @InjectRepository(State) private stateRepo: Repository<State>,
-        @InjectRepository(District) private districtRepo: Repository<District>,
-        @InjectRepository(PoliceStation) private policeRepo: Repository<PoliceStation>,
-        @InjectRepository(Post) private postRepo: Repository<Post>,
-    ) {}
+  constructor(
+    @InjectRepository(Country)
+    private countryRepo: Repository<Country>,
 
-    async createCountry(name: string) {
-        // const country = this.countryRepo.create({ name });
-        return await this.countryRepo.save({ name });
+    @InjectRepository(State)
+    private stateRepo: Repository<State>,
+
+    @InjectRepository(District)
+    private districtRepo: Repository<District>,
+
+    @InjectRepository(PoliceStation)
+    private policeRepo: Repository<PoliceStation>,
+
+    @InjectRepository(Post)
+    private postRepo: Repository<Post>,
+  ) {}
+
+  // ======================================================
+  // COUNTRY CRUD
+  // ======================================================
+
+  async createCountry(data: Partial<Country>) {
+    const country = this.countryRepo.create(data);
+    return await this.countryRepo.save(country);
+  }
+
+  async getAllCountries() {
+    return await this.countryRepo.find({
+      relations: ['states'],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getCountryById(id: number) {
+    const country = await this.countryRepo.findOne({
+      where: { id },
+      relations: ['states'],
+    });
+
+    if (!country) {
+      throw new NotFoundException(
+        'Country not found',
+      );
     }
 
-    async createState(name: string, countryId: number) {
-        // const state = this.stateRepo.create({ name, countryId });
-        return await this.stateRepo.save({ name, countryId });
+    return country;
+  }
+
+  async updateCountry(
+    id: number,
+    data: Partial<Country>,
+  ) {
+    const country = await this.getCountryById(id);
+
+    Object.assign(country, data);
+
+    return await this.countryRepo.save(country);
+  }
+
+  async deleteCountry(id: number) {
+    const country = await this.getCountryById(id);
+
+    await this.countryRepo.remove(country);
+
+    return {
+      message: 'Country deleted successfully',
+    };
+  }
+
+  // ======================================================
+  // STATE CRUD
+  // ======================================================
+
+  async createState(data: Partial<State>) {
+    const state = this.stateRepo.create(data);
+
+    return await this.stateRepo.save(state);
+  }
+
+  async getAllStates() {
+    return await this.stateRepo.find({
+      relations: ['country', 'districts'],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getStateById(id: number) {
+    const state = await this.stateRepo.findOne({
+      where: { id },
+      relations: ['country', 'districts'],
+    });
+
+    if (!state) {
+      throw new NotFoundException(
+        'State not found',
+      );
     }
 
-    async createDistrict(name: string, stateId: number) {
-        // const district = this.districtRepo.create({ name, stateId });
-        return await this.districtRepo.save({ name, stateId });
+    return state;
+  }
+
+  async updateState(
+    id: number,
+    data: Partial<State>,
+  ) {
+    const state = await this.getStateById(id);
+
+    Object.assign(state, data);
+
+    return await this.stateRepo.save(state);
+  }
+
+  async deleteState(id: number) {
+    const state = await this.getStateById(id);
+
+    await this.stateRepo.remove(state);
+
+    return {
+      message: 'State deleted successfully',
+    };
+  }
+
+  // ======================================================
+  // DISTRICT CRUD
+  // ======================================================
+
+  async createDistrict(data: Partial<District>) {
+    const district =
+      this.districtRepo.create(data);
+
+    return await this.districtRepo.save(
+      district,
+    );
+  }
+
+  async getAllDistricts() {
+    return await this.districtRepo.find({
+      relations: [
+        'state',
+        'policeStations',
+        'posts',
+      ],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getDistrictById(id: number) {
+    const district =
+      await this.districtRepo.findOne({
+        where: { id },
+        relations: [
+          'state',
+          'policeStations',
+          'posts',
+        ],
+      });
+
+    if (!district) {
+      throw new NotFoundException(
+        'District not found',
+      );
     }
 
-    async createPoliceStation(name: string, districtId: number) {
-        // const policeStation = this.policeRepo.create({ name, districtId });
-        return await this.policeRepo.save({ name, districtId });
+    return district;
+  }
+
+  async updateDistrict(
+    id: number,
+    data: Partial<District>,
+  ) {
+    const district =
+      await this.getDistrictById(id);
+
+    Object.assign(district, data);
+
+    return await this.districtRepo.save(
+      district,
+    );
+  }
+
+  async deleteDistrict(id: number) {
+    const district =
+      await this.getDistrictById(id);
+
+    await this.districtRepo.remove(district);
+
+    return {
+      message:
+        'District deleted successfully',
+    };
+  }
+
+  // ======================================================
+  // POLICE STATION CRUD
+  // ======================================================
+
+  async createPoliceStation(
+    data: Partial<PoliceStation>,
+  ) {
+    const police =
+      this.policeRepo.create(data);
+
+    return await this.policeRepo.save(police);
+  }
+
+  async getAllPoliceStations() {
+    return await this.policeRepo.find({
+      relations: ['district'],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getPoliceStationById(id: number) {
+    const police =
+      await this.policeRepo.findOne({
+        where: { id },
+        relations: ['district'],
+      });
+
+    if (!police) {
+      throw new NotFoundException(
+        'Police Station not found',
+      );
     }
 
-    async createPost(name: string, districtId: number) {
-        // const post = this.postRepo.create({ name, districtId });
-        return await this.postRepo.save({ name, districtId });
+    return police;
+  }
+
+  async updatePoliceStation(
+    id: number,
+    data: Partial<PoliceStation>,
+  ) {
+    const police =
+      await this.getPoliceStationById(id);
+
+    Object.assign(police, data);
+
+    return await this.policeRepo.save(police);
+  }
+
+  async deletePoliceStation(id: number) {
+    const police =
+      await this.getPoliceStationById(id);
+
+    await this.policeRepo.remove(police);
+
+    return {
+      message:
+        'Police Station deleted successfully',
+    };
+  }
+
+  // ======================================================
+  // POST CRUD
+  // ======================================================
+
+  async createPost(data: Partial<Post>) {
+    const post = this.postRepo.create(data);
+
+    return await this.postRepo.save(post);
+  }
+
+  async getAllPosts() {
+    return await this.postRepo.find({
+      relations: ['district'],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getPostById(id: number) {
+    const post = await this.postRepo.findOne({
+      where: { id },
+      relations: ['district'],
+    });
+
+    if (!post) {
+      throw new NotFoundException(
+        'Post not found',
+      );
     }
 
+    return post;
+  }
 
+  async updatePost(
+    id: number,
+    data: Partial<Post>,
+  ) {
+    const post = await this.getPostById(id);
+
+    Object.assign(post, data);
+
+    return await this.postRepo.save(post);
+  }
+
+  async deletePost(id: number) {
+    const post = await this.getPostById(id);
+
+    await this.postRepo.remove(post);
+
+    return {
+      message: 'Post deleted successfully',
+    };
+  }
+
+  async getPostsByPinCode(pin_code: string) {
+    const pin = Number(pin_code);
+    const results = await this.postRepo
+      .createQueryBuilder('post')
+      // .leftJoinAndSelect('post.policeStations', 'policeStation')
+      // .leftJoinAndSelect('policeStation.district', 'district')
+      // .leftJoinAndSelect('district.state', 'state')
+      // .leftJoinAndSelect('state.country', 'country')
+      .where('post.pin_code = :pin', { pin_code: pin })
+      .getMany();
+
+    if (results.length) {
+      return {
+        status: 1,
+        message: 'Posts found for the given pin code',
+        data: [],
+      }
+    }
+
+  //   const data = results.map(post => ({
+  //     post_name: post.name,
+  //     pin_code: post.pin_code,
+  //     police_station: post.policeStations?.name,
+  //     district: post.policeStations.map(ps => ps.district.name),
+  //     state: post.policeStations.map(ps => ps.district.state.name),
+  //     country: post.policeStations.map(ps => ps.district.state.country.name),
+  //   }));
+
+  //   return {
+  //     status: 1,
+  //     message: 'Posts found for the given pin code',
+  //     data,
+  //   };
+  }
 }

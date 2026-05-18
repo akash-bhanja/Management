@@ -16,5 +16,5 @@ export class Country {
   updated_at!: Date;
 
   @OneToMany(() => State, (state: State) => state.country)
-  state!: State[];
+  states!: State[];
 }

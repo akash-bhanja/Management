@@ -1,15 +1,283 @@
-import { Controller, Post } from '@nestjs/common';
+import {Body,Controller,Delete,Get,Param,ParseIntPipe,Post,Put, Query,} from '@nestjs/common';
+
 import { AddressService } from './address.service';
 import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('address')
 export class AddressController {
-    constructor(private readonly addressService: AddressService) {}
-    
-    @Post('country')
-    @ApiQuery({ name: 'name', type: String, description: 'Name of the country' })
-    createCountry(name: string) {
-        return this.addressService.createCountry(name);
-    }
-    
+  constructor(
+    private readonly addressService: AddressService,
+  ) {}
+
+  // ======================================================
+  // COUNTRY APIs
+  // ======================================================
+
+  @Post('country/create')
+  @ApiQuery({
+    name: 'name',
+    description: 'Country name',
+    type: String,
+    example: 'India',
+    required: true,
+  })
+  createCountry(@Query('name') name: string) {
+    return this.addressService.createCountry(
+        { name },
+    );
+  }
+
+  @Get('country/all')
+  getAllCountries() {
+    return this.addressService.getAllCountries();
+  }
+
+  @Get('country/:id')
+  getCountryById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.getCountryById(
+      id,
+    );
+  }
+
+  @Put('country/:id')
+  updateCountry(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updateCountry(
+      id,
+      body,
+    );
+  }
+
+  @Delete('country/:id')
+  deleteCountry(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.deleteCountry(
+      id,
+    );
+  }
+
+  // ======================================================
+  // STATE APIs
+  // ======================================================
+
+  @Post('state/create')
+  @ApiQuery({
+    name: 'name',
+    description: 'State name',
+    type: String,
+    example: 'Maharashtra',
+    required: true,   
+  })
+  createState(@Query('name') name: string) {
+    return this.addressService.createState(
+      { name },
+    );
+  }
+
+  @Get('state/all')
+  getAllStates() {
+    return this.addressService.getAllStates();
+  }
+
+  @Get('state/:id')
+  getStateById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.getStateById(id);
+  }
+
+  @Put('state/:id')
+  updateState(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updateState(
+      id,
+      body,
+    );
+  }
+
+  @Delete('state/:id')
+  deleteState(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.deleteState(id);
+  }
+
+  // ======================================================
+  // DISTRICT APIs
+  // ======================================================
+
+  @Post('district/create')
+  @ApiQuery({
+    name: 'name',
+    description: 'District name',
+    type: String,
+    example: 'Mumbai',
+    required: true,   
+  })
+  createDistrict(@Query('name') name: string) {
+    return this.addressService.createDistrict(
+      { name },
+    );
+  }
+
+  @Get('district/all')
+  getAllDistricts() {
+    return this.addressService.getAllDistricts();
+  }
+
+  @Get('district/:id')
+  getDistrictById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.getDistrictById(
+      id,
+    );
+  }
+
+  @Put('district/:id')
+  updateDistrict(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updateDistrict(
+      id,
+      body,
+    );
+  }
+
+  @Delete('district/:id')
+  deleteDistrict(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.deleteDistrict(
+      id,
+    );
+  }
+
+  // ======================================================
+  // POLICE STATION APIs
+  // ======================================================
+
+  @Post('police/create')
+  @ApiQuery({
+    name: 'name',
+    description: 'Police station name',
+    type: String,
+    example: 'Mumbai Police Station',
+    required: true,   
+  })
+  createPolice(@Query('name') name: string) {
+    return this.addressService.createPoliceStation(
+      { name },
+    );
+  }
+
+  @Get('police/all')
+  getAllPolice() {
+    return this.addressService.getAllPoliceStations();
+  }
+
+  @Get('police/:id')
+  getPoliceById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.getPoliceStationById(
+      id,
+    );
+  }
+
+  @Put('police/:id')
+  updatePolice(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updatePoliceStation(
+      id,
+      body,
+    );
+  }
+
+  @Delete('police/:id')
+  deletePolice(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.deletePoliceStation(
+      id,
+    );
+  }
+
+  // ======================================================
+  // POST APIs
+  // ======================================================
+
+  @Post('post/create')
+  @ApiQuery({
+    name: 'name',
+    description: 'Post name',
+    type: String,
+    example: 'Mumbai Post Office',
+    required: true,   
+  })
+  @ApiQuery({
+  name: 'pin_code',
+  description: 'PIN Code',
+  type: String,
+  example: '400001',
+  required: true,
+ })
+  createPost(@Query('name') name: string,
+   @Query('pin_code') pin_code: string) {
+    return this.addressService.createPost({ name, pin_code });
+  }
+
+  @Get('post/all')
+  getAllPosts() {
+    return this.addressService.getAllPosts();
+  }
+
+  @Get('post/:id')
+  getPostById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.getPostById(id);
+  }
+
+  @Put('post/:id')
+  updatePost(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updatePost(
+      id,
+      body,
+    );
+  }
+
+  @Delete('post/:id')
+  deletePost(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.addressService.deletePost(id);
+  }
+
+  @Get('post/pincode')
+  @ApiQuery({
+    name: 'pin_code',
+    description: 'PIN Code',
+    type: String,
+    example: '400001',
+    required: true,
+  })
+  getPostsByPinCode(@Query('pin_code') pin_code: string) {
+    return this.addressService.getPostsByPinCode(pin_code);
+  }
+  
+
 }

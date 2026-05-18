@@ -10,7 +10,9 @@ export class State {
   @Column({ length: 100 })
   name!: string;
 
-  @ManyToOne(() => Country, (country: Country) => country.state)
+  @ManyToOne(() => Country, (country: Country) => country.states, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'country_id' })
   country!: Country;
 

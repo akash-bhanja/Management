@@ -16,7 +16,7 @@ export class District {
   state!: State;
 
   @OneToMany(() => PoliceStation, (policeStation: PoliceStation) => policeStation.district)
-  police_stations!: PoliceStation[];
+  policeStations!: PoliceStation[];
 
   @OneToMany(() => Post, (post: Post) => post.district)
   posts!: Post[];
