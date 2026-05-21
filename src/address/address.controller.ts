@@ -22,9 +22,7 @@ export class AddressController {
     required: true,
   })
   createCountry(@Query('name') name: string) {
-    return this.addressService.createCountry(
-        { name },
-    );
+    return this.addressService.createCountry(name);
   }
 
   @Get('country/all')
@@ -65,7 +63,7 @@ export class AddressController {
   // STATE APIs
   // ======================================================
 
-  @Post('state/create')
+ @Post('state/create')
   @ApiQuery({
     name: 'name',
     description: 'State name',
@@ -73,10 +71,15 @@ export class AddressController {
     example: 'Maharashtra',
     required: true,   
   })
-  createState(@Query('name') name: string) {
-    return this.addressService.createState(
-      { name },
-    );
+  @ApiQuery({
+    name: 'country_Id',
+    description: 'ID of the country this state belongs to',
+    type: Number,
+    example: 1,
+    required: true,
+  })
+  createState(@Query('name') name: string, @Query('country_Id') country_Id: number) {
+    return this.addressService.createState(name, country_Id);
   }
 
   @Get('state/all')
@@ -121,10 +124,15 @@ export class AddressController {
     example: 'Mumbai',
     required: true,   
   })
-  createDistrict(@Query('name') name: string) {
-    return this.addressService.createDistrict(
-      { name },
-    );
+  @ApiQuery({
+    name: 'state_Id',
+    description: 'ID of the state this district belongs to',
+    type: Number,
+    example: 1,
+    required: true, 
+  })
+  createDistrict(@Query('name') name: string, @Query('state_Id') state_Id: number) {
+    return this.addressService.createDistrict(name, state_Id);
   }
 
   @Get('district/all')
@@ -173,10 +181,15 @@ export class AddressController {
     example: 'Mumbai Police Station',
     required: true,   
   })
-  createPolice(@Query('name') name: string) {
-    return this.addressService.createPoliceStation(
-      { name },
-    );
+  @ApiQuery({
+    name: 'district_Id',
+    description: 'ID of the district this police station belongs to',
+    type: Number,
+    example: 1,
+    required: true,
+  })
+  createPolice(@Query('name') name: string, @Query('district_Id') district_Id: number) {
+    return this.addressService.createPoliceStation(name, district_Id);
   }
 
   @Get('police/all')
@@ -232,9 +245,8 @@ export class AddressController {
   example: '400001',
   required: true,
  })
-  createPost(@Query('name') name: string,
-   @Query('pin_code') pin_code: string) {
-    return this.addressService.createPost({ name, pin_code });
+  createPost(@Query('name') name: string,@Query('pin_code') pin_code: string, @Query('district_Id') district_Id: number) {
+    return this.addressService.createPost(name, pin_code, district_Id);
   }
 
   @Get('post/all')

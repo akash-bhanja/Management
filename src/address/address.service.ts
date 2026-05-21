@@ -32,9 +32,8 @@ export class AddressService {
   // COUNTRY CRUD
   // ======================================================
 
-  async createCountry(data: Partial<Country>) {
-    const country = this.countryRepo.create(data);
-    return await this.countryRepo.save(country);
+  async createCountry(name: string) {
+    return await this.countryRepo.save({ name });
   }
 
   async getAllCountries() {
@@ -84,10 +83,8 @@ export class AddressService {
   // STATE CRUD
   // ======================================================
 
-  async createState(data: Partial<State>) {
-    const state = this.stateRepo.create(data);
-
-    return await this.stateRepo.save(state);
+  async createState(name: string, country_Id: number) {
+    return await this.stateRepo.save({name, countries: {id: country_Id}});
   }
 
   async getAllStates() {
@@ -137,13 +134,9 @@ export class AddressService {
   // DISTRICT CRUD
   // ======================================================
 
-  async createDistrict(data: Partial<District>) {
-    const district =
-      this.districtRepo.create(data);
-
-    return await this.districtRepo.save(
-      district,
-    );
+  async createDistrict(name: string, state_Id: number) {
+    return await this.districtRepo.save({name, state: {id: state_Id}});
+ 
   }
 
   async getAllDistricts() {
@@ -207,13 +200,8 @@ export class AddressService {
   // POLICE STATION CRUD
   // ======================================================
 
-  async createPoliceStation(
-    data: Partial<PoliceStation>,
-  ) {
-    const police =
-      this.policeRepo.create(data);
-
-    return await this.policeRepo.save(police);
+  async createPoliceStation(name: string, district_Id: number) {
+    return await this.policeRepo.save({name, district: {id: district_Id}});
   }
 
   async getAllPoliceStations() {
@@ -267,10 +255,8 @@ export class AddressService {
   // POST CRUD
   // ======================================================
 
-  async createPost(data: Partial<Post>) {
-    const post = this.postRepo.create(data);
-
-    return await this.postRepo.save(post);
+  async createPost(name: string, pin_code: string, district_Id: number) {
+    return await this.postRepo.save({name, pin_code, district: {id: district_Id}});
   }
 
   async getAllPosts() {
