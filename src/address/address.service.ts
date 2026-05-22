@@ -83,8 +83,8 @@ export class AddressService {
   // STATE CRUD
   // ======================================================
 
-  async createState(name: string, country_Id: number) {
-    return await this.stateRepo.save({name, countries: {id: country_Id}});
+ async createState(name: string, country_Id: number) {
+  return await this.stateRepo.save({ name, country: { id: country_Id }, });
   }
 
   async getAllStates() {

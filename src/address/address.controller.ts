@@ -64,23 +64,17 @@ export class AddressController {
   // ======================================================
 
  @Post('state/create')
-  @ApiQuery({
-    name: 'name',
-    description: 'State name',
-    type: String,
-    example: 'Maharashtra',
-    required: true,   
-  })
-  @ApiQuery({
-    name: 'country_Id',
-    description: 'ID of the country this state belongs to',
-    type: Number,
-    example: 1,
-    required: true,
-  })
-  createState(@Query('name') name: string, @Query('country_Id') country_Id: number) {
-    return this.addressService.createState(name, country_Id);
+@ApiQuery({ name: 'name',description: 'State name',type: String,example: 'Maharashtra',required: true,})
+@ApiQuery({name: 'country_Id',description: 'ID of the country this state belongs to',type: Number,example: 1,required: true,})
+
+createState( @Query('name') name: string,
+             @Query('country_Id') country_Id: string,) {
+  return this.addressService.createState(name, Number(country_Id));
   }
+
+
+
+
 
   @Get('state/all')
   getAllStates() {
