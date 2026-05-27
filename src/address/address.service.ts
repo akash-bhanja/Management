@@ -130,6 +130,8 @@ export class AddressService {
     };
   }
 
+
+
   // ======================================================
   // DISTRICT CRUD
   // ======================================================
@@ -303,14 +305,13 @@ export class AddressService {
   }
 
   async getPostsByPinCode(pin_code: string) {
-    const pin = Number(pin_code);
     const results = await this.postRepo
       .createQueryBuilder('post')
-      // .leftJoinAndSelect('post.policeStations', 'policeStation')
-      // .leftJoinAndSelect('policeStation.district', 'district')
-      // .leftJoinAndSelect('district.state', 'state')
-      // .leftJoinAndSelect('state.country', 'country')
-      .where('post.pin_code = :pin', { pin_code: pin })
+      .leftJoinAndSelect('post.policeStations', 'policeStation')
+      .leftJoinAndSelect('policeStation.district', 'district')
+      .leftJoinAndSelect('district.state', 'state')
+      .leftJoinAndSelect('state.country', 'country')
+      .where('1')
       .getMany();
 
     if (results.length) {
@@ -320,20 +321,37 @@ export class AddressService {
         data: [],
       }
     }
+  }  
 
-  //   const data = results.map(post => ({
-  //     post_name: post.name,
-  //     pin_code: post.pin_code,
-  //     police_station: post.policeStations?.name,
-  //     district: post.policeStations.map(ps => ps.district.name),
-  //     state: post.policeStations.map(ps => ps.district.state.name),
-  //     country: post.policeStations.map(ps => ps.district.state.country.name),
-  //   }));
+    async getPoliceStationsFullDetails(name: string) {
+        const results = await this.policeRepo
+          .createQueryBuilder('policeStation')
+          .leftJoinAndSelect('policeStation.district', 'district')
+          .leftJoinAndSelect('district.state', 'state')
+          .leftJoinAndSelect('state.country', 'country')
+          .where('policeStation.name LIKE :name', { name: `%${name}%` })
+          .getMany();
+        
+      return {
+        status: 0,
+        message: 'Police stations found for the given name',
+        data: results,
+      }
+      }
+      
+    // const data = results.map(post => ({
+    //   post_name: post.name,
+    //   pin_code: post.pin_code,
+    //   police_station: post.policeStations?.name,
+    //   district: post.policeStations?.district.name,
+    //   state: post.policeStations?.district.state.name,
+    //   country: post.policeStations?.district.state.country.name,
+    // }));
 
-  //   return {
-  //     status: 1,
-  //     message: 'Posts found for the given pin code',
-  //     data,
-  //   };
-  }
+    // return {
+    //   status: 1,
+    //   message: 'Posts found for the given pin code',
+    //   data,
+    // };
+  
 }

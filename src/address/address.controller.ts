@@ -32,7 +32,7 @@ export class AddressController {
 
   @Get('country/:id')
   getCountryById(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.getCountryById(
       id,
@@ -41,7 +41,7 @@ export class AddressController {
 
   @Put('country/:id')
   updateCountry(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() body: any,
   ) {
     return this.addressService.updateCountry(
@@ -52,7 +52,7 @@ export class AddressController {
 
   @Delete('country/:id')
   deleteCountry(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.deleteCountry(
       id,
@@ -83,14 +83,14 @@ createState( @Query('name') name: string,
 
   @Get('state/:id')
   getStateById(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.getStateById(id);
   }
 
   @Put('state/:id')
   updateState(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() body: any,
   ) {
     return this.addressService.updateState(
@@ -101,7 +101,7 @@ createState( @Query('name') name: string,
 
   @Delete('state/:id')
   deleteState(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.deleteState(id);
   }
@@ -136,7 +136,7 @@ createState( @Query('name') name: string,
 
   @Get('district/:id')
   getDistrictById(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.getDistrictById(
       id,
@@ -145,7 +145,7 @@ createState( @Query('name') name: string,
 
   @Put('district/:id')
   updateDistrict(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() body: any,
   ) {
     return this.addressService.updateDistrict(
@@ -156,7 +156,7 @@ createState( @Query('name') name: string,
 
   @Delete('district/:id')
   deleteDistrict(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.deleteDistrict(
       id,
@@ -193,7 +193,7 @@ createState( @Query('name') name: string,
 
   @Get('police/:id')
   getPoliceById(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.getPoliceStationById(
       id,
@@ -202,7 +202,7 @@ createState( @Query('name') name: string,
 
   @Put('police/:id')
   updatePolice(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() body: any,
   ) {
     return this.addressService.updatePoliceStation(
@@ -213,7 +213,7 @@ createState( @Query('name') name: string,
 
   @Delete('police/:id')
   deletePolice(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.deletePoliceStation(
       id,
@@ -250,14 +250,14 @@ createState( @Query('name') name: string,
 
   @Get('post/:id')
   getPostById(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.getPostById(id);
   }
 
   @Put('post/:id')
   updatePost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() body: any,
   ) {
     return this.addressService.updatePost(
@@ -268,7 +268,7 @@ createState( @Query('name') name: string,
 
   @Delete('post/:id')
   deletePost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ) {
     return this.addressService.deletePost(id);
   }
@@ -284,6 +284,17 @@ createState( @Query('name') name: string,
   getPostsByPinCode(@Query('pin_code') pin_code: string) {
     return this.addressService.getPostsByPinCode(pin_code);
   }
-  
+
+  @Get('police/details')
+  @ApiQuery({
+    name: 'name',
+    description: 'Police station name',
+    type: String,
+    example: 'Mumbai Police Station',
+    required: true,
+  })
+  getPoliceStationsFullDetails(@Query('name') name: string) {
+    return this.addressService.getPoliceStationsFullDetails(name);
+  }
 
 }
