@@ -304,24 +304,34 @@ export class AddressService {
     };
   }
 
-  async getPostsByPinCode(pin_code: string) {
-    const results = await this.postRepo
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.policeStations', 'policeStation')
-      .leftJoinAndSelect('policeStation.district', 'district')
-      .leftJoinAndSelect('district.state', 'state')
-      .leftJoinAndSelect('state.country', 'country')
-      .where('1')
-      .getMany();
+  
+async getPostsByPinCode(pin_code: string) {
+   const results = await this.postRepo
+  .createQueryBuilder('post')
+  .leftJoinAndSelect('post.district', 'district')
+  .leftJoinAndSelect('district.state', 'state')
+  .leftJoinAndSelect('state.country', 'country')
+  .where('post.pin_code = :pin_code', { pin_code })
+  .getMany();
+
+
+    const data = results.map(item => ({
+      post_office: item.name,
+      pin: item.pin_code,
+      District: item.district?.name,
+      state: item.district?.state?.name,
+      country: item.district?.state?.country?.name,
+    }));
+
 
     if (results.length) {
       return {
         status: 1,
         message: 'Posts found for the given pin code',
-        data: [],
+        data
       }
     }
-  }  
+  }
 
     async getPoliceStationsFullDetails(name: string) {
         const results = await this.policeRepo

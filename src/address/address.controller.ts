@@ -273,17 +273,13 @@ createState( @Query('name') name: string,
     return this.addressService.deletePost(id);
   }
 
-  @Get('post/pincode')
-  @ApiQuery({
-    name: 'pin_code',
-    description: 'PIN Code',
-    type: String,
-    example: '400001',
-    required: true,
-  })
-  getPostsByPinCode(@Query('pin_code') pin_code: string) {
+   @Get('post/pincode')
+  async getPostsByPinCode(
+    @Query('pin_code') pin_code: string,
+  ) {
     return this.addressService.getPostsByPinCode(pin_code);
   }
+
 
   @Get('police/details')
   @ApiQuery({
