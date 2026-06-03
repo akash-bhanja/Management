@@ -239,39 +239,48 @@ createState( @Query('name') name: string,
   example: '400001',
   required: true,
  })
-  createPost(@Query('name') name: string,@Query('pin_code') pin_code: string, @Query('district_Id') district_Id: number) {
-    return this.addressService.createPost(name, pin_code, district_Id);
+  @ApiQuery({
+    name: 'police_station_Id',
+    description: 'ID of the police station this post belongs to',
+    type: Number,
+    example: 1,
+    required: true,
+  })
+  createPost(@Query('name') name: string,@Query('pin_code') pin_code: string, 
+  @Query('district_Id') district_Id: number,
+  @Query('police_station_Id') police_station_Id: number) {
+    return this.addressService.createPost(name, pin_code, district_Id, police_station_Id);
   }
 
-  @Get('post/all')
-  getAllPosts() {
-    return this.addressService.getAllPosts();
-  }
+  // @Get('post/all')
+  // getAllPosts() {
+  //   return this.addressService.getAllPosts();
+  // }
 
-  @Get('post/:id')
-  getPostById(
-    @Param('id') id: number,
-  ) {
-    return this.addressService.getPostById(id);
-  }
+  // @Get('post/:id')
+  // getPostById(
+  //   @Param('id') id: number,
+  // ) {
+  //   return this.addressService.getPostById(id);
+  // }
 
-  @Put('post/:id')
-  updatePost(
-    @Param('id') id: number,
-    @Body() body: any,
-  ) {
-    return this.addressService.updatePost(
-      id,
-      body,
-    );
-  }
+  // @Put('post/:id')
+  // updatePost(
+  //   @Param('id') id: number,
+  //   @Body() body: any,
+  // ) {
+  //   return this.addressService.updatePost(
+  //     id,
+  //     body,
+  //   );
+  // }
 
-  @Delete('post/:id')
-  deletePost(
-    @Param('id') id: number,
-  ) {
-    return this.addressService.deletePost(id);
-  }
+  // @Delete('post/:id')
+  // deletePost(
+  //   @Param('id') id: number,
+  // ) {
+  //   return this.addressService.deletePost(id);
+  // }
 
    @Get('post/pincode')
   async getPostsByPinCode(

@@ -8,6 +8,7 @@ import { State } from './entity/state.entity';
 import { District } from './entity/district.entity';
 import { PoliceStation } from './entity/police.entity';
 import { Post } from './entity/post.entity';
+import { User } from '../entity/user.entity';
 
 @Injectable()
 export class AddressService {
@@ -26,6 +27,9 @@ export class AddressService {
 
     @InjectRepository(Post)
     private postRepo: Repository<Post>,
+
+    @InjectRepository(User)
+    private usersRepo: Repository<User>,
   ) {}
 
   // ======================================================
@@ -257,8 +261,8 @@ export class AddressService {
   // POST CRUD
   // ======================================================
 
-  async createPost(name: string, pin_code: string, district_Id: number) {
-    return await this.postRepo.save({name, pin_code, district: {id: district_Id}});
+  async createPost(name: string, pin_code: string, district_Id: number, police_station_Id: number) {
+    return await this.postRepo.save({name, pin_code, district: {id: district_Id}, police_station: {id: police_station_Id}});
   }
 
   async getAllPosts() {
@@ -347,21 +351,34 @@ async getPostsByPinCode(pin_code: string) {
         message: 'Police stations found for the given name',
         data: results,
       }
-      }
-      
-    // const data = results.map(post => ({
-    //   post_name: post.name,
-    //   pin_code: post.pin_code,
-    //   police_station: post.policeStations?.name,
-    //   district: post.policeStations?.district.name,
-    //   state: post.policeStations?.district.state.name,
-    //   country: post.policeStations?.district.state.country.name,
-    // }));
+    }
+  
+  // async getUserAddressByName(userName: string) {
+  //   const results = await this.usersRepo.
+  //     .createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.posts', 'post')
+  //     .leftJoinAndSelect('user.policeStations', 'policeStation')
+  //     .leftJoinAndSelect('policeStation.district', 'district')
+  //     .leftJoinAndSelect('district.state', 'state')
+  //     .leftJoinAndSelect('state.country', 'country')
+  //     .where('user.name LIKE :name', { name: `%${userName}%` })
+  //     .getMany();
 
-    // return {
-    //   status: 1,
-    //   message: 'Posts found for the given pin code',
-    //   data,
-    // };
+  //     if (results.length) {
+  //       return {
+  //         status: 1,
+  //         message: 'User address details found for the given name',
+  //         data: results,
+  //       }
+  //     } else {
+  //       return {
+  //         status: 0,
+  //         message: 'No user address details found for the given name',
+  //         data: [],
+  //       }
+  //     }
+  //  }
+      
+
   
 }
