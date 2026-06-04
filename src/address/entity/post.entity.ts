@@ -1,10 +1,20 @@
-import {Entity,PrimaryGeneratedColumn,Column,ManyToOne,JoinColumn,CreateDateColumn,UpdateDateColumn,Unique, OneToMany, ManyToMany,} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  OneToMany,
+} from 'typeorm';
+
 import { District } from './district.entity';
 import { PoliceStation } from './police.entity';
 import { User } from 'src/entity/user.entity';
 
 @Entity('posts')
-@Unique(['name', 'district']) // Prevent duplicate names within same district
 export class Post {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -12,15 +22,18 @@ export class Post {
   @Column({ length: 150 })
   name!: string;
 
-  @ManyToOne(() => District, (district: District) => district.posts)
-  @JoinColumn({ name: 'district_id' })
-  district!: District;
+  // @ManyToOne(() => District, (district) => district.posts)
+  // @JoinColumn({ name: 'district_id' })
+  // district!: District;
 
-  @ManyToOne(() => PoliceStation, (policeStation: PoliceStation) => policeStation.posts)
+  @ManyToOne(
+    () => PoliceStation,
+    (policeStation) => policeStation.posts,
+  )
   @JoinColumn({ name: 'police_station_id' })
   police_station!: PoliceStation;
 
-  @ManyToMany(() => User, (user: User) => user.posts)
+   @OneToMany(() => User, (user) => user.post)
   users!: User[];
 
   @Column({ length: 10, nullable: true })

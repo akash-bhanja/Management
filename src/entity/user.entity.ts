@@ -1,5 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, ManyToMany } from 'typeorm';
-import { Role } from '../entity/role.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Rolle } from '../entity/rolle.entity';
 import { Post } from 'src/address/entity/post.entity';
 
 @Entity('users')
@@ -16,12 +23,13 @@ export class User {
   @Column()
   password!: string;
 
-  @ManyToOne(() => Role)
+  @ManyToOne(() => Rolle)
   @JoinColumn({ name: 'role_id' })
-  role!: Role;
+  role!: Rolle;
 
-  @ManyToMany(() => Post)
-  @JoinColumn({ name: 'post_id' })
-  posts!: Post[];
+   
 
+@ManyToOne(() => Post, { nullable: true })
+@JoinColumn({ name: 'post_id' })
+post!: Post;
 }

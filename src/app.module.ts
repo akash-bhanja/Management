@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { Role } from './entity/role.entity';
 import { User } from './entity/user.entity';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
@@ -28,7 +27,7 @@ import { Post } from './address/entity/post.entity';
       username: 'root',
       password: '',
       database: 'management',
-      entities: [Country, State, District, PoliceStation, Post ],
+      entities: [Country, State, District, PoliceStation, Post,User,Rolle,Employee,Department ],
       synchronize: true, // ❗ Use false in production
     }),
 

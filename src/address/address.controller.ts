@@ -1,7 +1,7 @@
 import {Body,Controller,Delete,Get,Param,ParseIntPipe,Post,Put, Query,} from '@nestjs/common';
 
 import { AddressService } from './address.service';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('address')
 export class AddressController {
@@ -225,84 +225,19 @@ createState( @Query('name') name: string,
   // ======================================================
 
 
-
+  @ApiTags('Post')
   @Post('post/create')
-  @ApiQuery({
-    name: 'name',
-    description: 'Post name',
-    type: String,
-    example: 'Mumbai Post Office',
-    required: true,   
-  })
-  @ApiQuery({
-  name: 'pin_code',
-  description: 'PIN Code',
-  type: String,
-  example: '400001',
-  required: true,
- })
-  @ApiQuery({
-    name: 'police_station_Id',
-    description: 'ID of the police station this post belongs to',
-    type: Number,
-    example: 1,
-    required: true,
-  })
-  createPost(@Query('name') name: string,@Query('pin_code') pin_code: string, 
-  @Query('district_Id') district_Id: number,
-  @Query('police_station_Id') police_station_Id: number) {
+  @ApiQuery({name: 'name',description: 'Post name',type: String,example: 'Mumbai Post Office',required: true,   })
+  @ApiQuery({name: 'pin_code',description: 'PIN Code',type: String,example: '400001',required: true,})
+  @ApiQuery({name: 'district_Id',description: 'ID of the district this post belongs to',type: Number,example: 1,required: true,})
+  @ApiQuery({name: 'police_station_Id',description: 'ID of the police station this post belongs to',type: Number,example: 1,required: true,})
+  createPost(@Query('name') name: string,
+             @Query('pin_code') pin_code: string, 
+             @Query('district_Id') district_Id: number,
+             @Query('police_station_Id') police_station_Id: number) {
     return this.addressService.createPost(name, pin_code, district_Id, police_station_Id);
   }
 
-  // @Get('post/all')
-  // getAllPosts() {
-  //   return this.addressService.getAllPosts();
-  // }
-
-  // @Get('post/:id')
-  // getPostById(
-  //   @Param('id') id: number,
-  // ) {
-  //   return this.addressService.getPostById(id);
-  // }
-
-  // @Put('post/:id')
-  // updatePost(
-  //   @Param('id') id: number,
-  //   @Body() body: any,
-  // ) {
-  //   return this.addressService.updatePost(
-  //     id,
-  //     body,
-  //   );
-  // }
-
-  // @Delete('post/:id')
-  // deletePost(
-  //   @Param('id') id: number,
-  // ) {
-  //   return this.addressService.deletePost(id);
-  // }
-
-
-//   @Post('post/create')
-//   @ApiQuery({
-//     name: 'name',
-//     description: 'Post name',
-//     type: String,
-//     example: 'Mumbai Post Office',
-//     required: true,   
-//   })
-//   @ApiQuery({
-//   name: 'pin_code',
-//   description: 'PIN Code',
-//   type: String,
-//   example: '400001',
-//   required: true,
-//  })
-//   createPost(@Query('name') name: string,@Query('pin_code') pin_code: string, @Query('district_Id') district_Id: number) {
-//     return this.addressService.createPost(name, pin_code, district_Id);
-//   }
 
 //   @Get('post/all')
 //   getAllPosts() {
@@ -333,15 +268,18 @@ createState( @Query('name') name: string,
 //   ) {
 //     return this.addressService.deletePost(id);
 //   }
+@ApiTags('Post')
+   @Get('/details/pincode')
+   @ApiQuery({  name: 'pin_code',  required: true,  example: '400001',})
+  async getPostsByPinCode( @Query('pin_code') pin_code: string,) {
+     return this.addressService.getPostsByPinCode(pin_code);
+  }
 
-//    @Get('post/pincode')
-//   async getPostsByPinCode(
-//     @Query('pin_code') pin_code: string,
-//   ) {
-//     return this.addressService.getPostsByPinCode(pin_code);
-//   }
 
 
+
+
+   @ApiTags('Police')
   @Get('police/details')
   @ApiQuery({
     name: 'name',
@@ -350,6 +288,10 @@ createState( @Query('name') name: string,
     example: 'Mumbai Police Station',
     required: true,
   })
+
+
+
+
   getPoliceStationsFullDetails(@Query('name') name: string) {
     return this.addressService.getPoliceStationsFullDetails(name);
   }

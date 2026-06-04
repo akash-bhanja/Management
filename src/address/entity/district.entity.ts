@@ -18,8 +18,8 @@ export class District {
   @OneToMany(() => PoliceStation, (policeStation: PoliceStation) => policeStation.district)
   policeStations!: PoliceStation[];
 
-  @OneToMany(() => Post, (post: Post) => post.district)
-  posts!: Post[];
+  // @OneToMany(() => Post, (post: Post) => post.district)
+  // posts!: Post[];
 
   @Column({ default: true })
   is_active!: boolean;

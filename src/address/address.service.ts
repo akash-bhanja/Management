@@ -309,22 +309,24 @@ export class AddressService {
   }
 
   
-async getPostsByPinCode(pin_code: string) {
-   const results = await this.postRepo
-  .createQueryBuilder('post')
-  .leftJoinAndSelect('post.district', 'district')
-  .leftJoinAndSelect('district.state', 'state')
-  .leftJoinAndSelect('state.country', 'country')
-  .where('post.pin_code = :pin_code', { pin_code })
-  .getMany();
+ async getPostsByPinCode(pin_code: string) {
+ const results = await this.postRepo
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.police_station', 'police')
+      .leftJoinAndSelect('police.district', 'district')
+      .leftJoinAndSelect('district.state', 'state')
+      .leftJoinAndSelect('state.country', 'country')
+      .where('post.pin_code = :pin_code', { pin_code })
+      .getMany();
 
 
-    const data = results.map(item => ({
+     const data = results.map(item => ({
       post_office: item.name,
       pin: item.pin_code,
-      District: item.district?.name,
-      state: item.district?.state?.name,
-      country: item.district?.state?.country?.name,
+      police_station: item.police_station?.name,
+      district: item.police_station?.district?.name,
+      state: item.police_station?.district?.state?.name,
+      country: item.police_station?.district?.state?.country?.name,
     }));
 
 
@@ -337,6 +339,8 @@ async getPostsByPinCode(pin_code: string) {
     }
   }
 
+
+// 
     async getPoliceStationsFullDetails(name: string) {
         const results = await this.policeRepo
           .createQueryBuilder('policeStation')
