@@ -8,10 +8,11 @@ import { Country } from './entity/country.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entity/post.entity';
 import { User } from 'src/entity/user.entity';
+import { Department } from 'src/entity/department.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Country, State, District, PoliceStation, Post, User])],
+  imports: [TypeOrmModule.forFeature([Country, State, District, PoliceStation, Post, User, Department])],
   controllers: [AddressController],
   providers: [AddressService],
 })

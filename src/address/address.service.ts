@@ -2,13 +2,13 @@ import {Injectable,NotFoundException,} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { createQueryBuilder, Repository } from 'typeorm';
-
 import { Country } from './entity/country.entity';
 import { State } from './entity/state.entity';
 import { District } from './entity/district.entity';
 import { PoliceStation } from './entity/police.entity';
 import { Post } from './entity/post.entity';
 import { User } from '../entity/user.entity';
+import { Department } from 'src/entity/department.entity';
 
 @Injectable()
 export class AddressService {
@@ -30,6 +30,9 @@ export class AddressService {
 
     @InjectRepository(User)
     private usersRepo: Repository<User>,
+
+    @InjectRepository(Department)
+    private departmentRepo: Repository<Department>
   ) {}
 
   // ======================================================
@@ -349,30 +352,49 @@ export class AddressService {
           .leftJoinAndSelect('state.country', 'country')
           .where('policeStation.name LIKE :name', { name: `%${name}%` })
           .getMany();
+
+          const data = results.map(item => ({
+            police_station: item.name,
+            district: item.district?.name,
+            state: item.district?.state?.name,
+            country: item.district?.state?.country?.name,
+          }));
         
       return {
         status: 0,
         message: 'Police stations found for the given name',
-        data: results,
+        data: data,
       }
     }
   
   // async getUserAddressByName(userName: string) {
-  //   const results = await this.usersRepo.
+  //   const results = await this.usersRepo
   //     .createQueryBuilder('user')
   //     .leftJoinAndSelect('user.posts', 'post')
-  //     .leftJoinAndSelect('user.policeStations', 'policeStation')
+  //     .leftJoinAndSelect('post.police_station', 'policeStation')
   //     .leftJoinAndSelect('policeStation.district', 'district')
   //     .leftJoinAndSelect('district.state', 'state')
   //     .leftJoinAndSelect('state.country', 'country')
-  //     .where('user.name LIKE :name', { name: `%${userName}%` })
+  //     .where('user.username LIKE :name', { name: `%${userName}%` })
   //     .getMany();
+
+  //     const data = results.map(user => ({
+  //       username: user.username,
+  //       email: user.email, 
+  //       post_id: user.posts.id,
+  //       post_name: user.posts.name,
+  //       police_station: user.posts.police_station?.name,
+  //       district: user.posts.police_station?.district?.name,
+  //       state: user.posts.police_station?.district?.state?.name,
+  //       country: user.posts.police_station?.district?.state?.country?.name,
+         
+  //     }));
 
   //     if (results.length) {
   //       return {
   //         status: 1,
   //         message: 'User address details found for the given name',
-  //         data: results,
+  //         data: data,
   //       }
   //     } else {
   //       return {
@@ -382,7 +404,92 @@ export class AddressService {
   //       }
   //     }
   //  }
-      
+    
+  
 
   
+// Using SubQuery to fetch user address details based on username
+  async getUserAddressByName(userName: string) {
+  const results = await this.usersRepo
+    .createQueryBuilder('user')
+    .select(['user.username', 'user.email', ])
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('p.id')
+      .from(Post, 'p')
+      .where('p.id = user.post_id'), 'post_id')
+
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('p.name')
+      .from(Post, 'p')
+      .where('p.id = user.post_id'), 'post_name'
+      
+    )
+
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('ps.name')
+      .from(PoliceStation, 'ps')
+      .where('ps.id = (SELECT p.police_station_id FROM posts p WHERE p.id = user.post_id)'), 'police_station'
+    )
+
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('d.name')
+      .from(District, 'd')
+      .where('d.id = (SELECT ps.district_id FROM police_stations ps WHERE ps.id = (SELECT p.police_station_id FROM posts p WHERE p.id = user.post_id))'), 'district'
+    )
+
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('s.name')
+      .from(State, 's')
+      .where('s.id = (SELECT d.state_id FROM districts d WHERE d.id = (SELECT ps.district_id FROM police_stations ps WHERE ps.id = (SELECT p.police_station_id FROM posts p WHERE p.id = user.post_id)))'), 'state'
+    )
+
+    .addSelect((qb) => qb
+      .subQuery()
+      .select('c.name')
+      .from(Country, 'c')
+      .where('c.id = (SELECT s.country_id FROM states s WHERE s.id = (SELECT d.state_id FROM districts d WHERE d.id = (SELECT ps.district_id FROM police_stations ps WHERE ps.id = (SELECT p.police_station_id FROM posts p WHERE p.id = user.post_id))))'), 'country'
+    )
+
+    .where('user.username LIKE :name', {name: `%${userName}%`,})
+    .getRawMany();
+
+  return results.length
+    ? {
+        status: 1,
+        message: 'User address details found for the given name',
+        data: results,
+      }
+    : {
+        status: 0,
+        message: 'No user address details found for the given name',
+        data: [],
+      };
+}
+
+
+async getUsersByDepartmentName(departmentName: string) {
+  const department = await this.departmentRepo
+    .createQueryBuilder('department')
+    .leftJoinAndSelect('department.users', 'users')
+    .leftJoinAndSelect('users.role', 'role')
+    .leftJoinAndSelect('users.posts', 'posts')
+    .leftJoinAndSelect('posts.police_station', 'policeStation')
+    .leftJoinAndSelect('policeStation.district', 'district')
+    .leftJoinAndSelect('district.state', 'state')
+    .leftJoinAndSelect('state.country', 'country')
+    .where('department.name = :departmentName', { departmentName })
+    .getOne();
+    
+
+  if (!department) {
+    throw new NotFoundException('Department not found');
+  }
+
+  return department;
+}
 }

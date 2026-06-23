@@ -65,4 +65,17 @@ export class MailController {
   otpVerify(@Body() body:any) {
     return this.mailService.verifyOTP(body.email, body.otp);
   }
+
+  @Post('send-user-info')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', example: 'john_doe' }
+      }
+    }
+  })
+  sendUserInfo(@Body('username') username: string) {
+  return this.mailService.sendUserInformation(username);
+}
 }

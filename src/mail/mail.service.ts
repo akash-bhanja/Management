@@ -4,10 +4,19 @@ import * as imaps from 'imap-simple';
 import path from 'path/win32';
 import fs from 'fs';
 import { simpleParser } from 'mailparser';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/entity/user.entity';
+import { MailSave } from 'src/entity/mailsave.entity';
 
 @Injectable()
 export class MailService {
+  constructor(
+    @InjectRepository(User,)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(MailSave,)
+    private readonly mailRepository: Repository<MailSave>
+  ) {}
   private imapConfig = {
     imap: {
       user: 'skybabu049@gmail.com',
@@ -52,7 +61,7 @@ export class MailService {
       return {
         errorCode: 1, 
         message: 'Failed to send email', 
-        error: error.message 
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }
@@ -224,10 +233,11 @@ type Email = {
       };
     } catch (error) {
       console.error('❌ Mail fetch error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         errorCode: 1,
         message: 'Failed to fetch mails',
-        error: error.message,
+        error: errorMessage,
       };
     }
   }
@@ -287,6 +297,77 @@ async verifyOTP(email: string, otp: string) {
 
   return { isValid: false, message: 'Invalid OTP' };
 
+}
+
+async sendUserInformation(username: string) {
+  try {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.department', 'department')
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('user.posts', 'posts')
+      .where('user.username = :username', { username })
+      .getOne();
+
+    if (!user) {
+      return {
+        errorCode: 1,
+        message: 'User not found',
+      };
+    }
+
+    const html = `
+      <div>
+        <h1>User Information</h1>
+        <p><strong>Name:</strong> ${user.username}</p>
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>Role:</strong> ${user.role?.name || 'N/A'}</p>
+        <p><strong>Department:</strong> ${user.department?.name || 'N/A'}</p>
+        <p><strong>Additional Info:</strong> ${user.posts?.[0]?.additionalInfo || 'N/A'}</p>
+      </div>
+    `;
+
+    // Send email
+    const info = await this.transporter.sendMail({
+      from: 'skybabu049@gmail.com',
+      to: user.email,
+      subject: 'User Information',
+      html,
+    });
+
+    const data = {
+      username: user.username,
+      email: user.email,
+      role: user.role?.name,
+      department: user.department?.name,
+      additionalInfo: user.posts?.[0]?.additionalInfo ?? null,
+    };
+
+    // Save mail log
+    const mailData = this.mailRepository.create({
+      fromEmail: 'skybabu049@gmail.com',
+      toEmail: user.email,
+      subject: 'User Information',
+      messageBody: JSON.stringify(data),
+      isSent: true,
+    });
+
+    await this.mailRepository.save(mailData);
+
+    return {
+      errorCode: 0,
+      message: 'Email sent successfully',
+      messageId: info.messageId,
+    };
+  } catch (error) {
+    console.error('Send Email Error:', error);
+
+    return {
+      errorCode: 1,
+      message: 'Failed to send email',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
 }
 }
 

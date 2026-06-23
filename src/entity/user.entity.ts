@@ -1,13 +1,7 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
-import { Rolle } from '../entity/rolle.entity';
+import {Entity,Column,PrimaryGeneratedColumn,ManyToOne,JoinColumn,OneToMany} from 'typeorm';
+import { Role } from './role.entity';
 import { Post } from 'src/address/entity/post.entity';
+import { Department } from './department.entity';
 
 @Entity('users')
 export class User {
@@ -23,13 +17,15 @@ export class User {
   @Column()
   password!: string;
 
-  @ManyToOne(() => Rolle)
+  @ManyToOne(() => Role)
   @JoinColumn({ name: 'role_id' })
-  role!: Rolle;
+  role!: Role;
 
-   
+  @ManyToOne(() => Department, { nullable: true })
+  @JoinColumn({ name: 'department_id' })
+  department!: Department;
 
-@ManyToOne(() => Post, { nullable: true })
-@JoinColumn({ name: 'post_id' })
-post!: Post;
+  @ManyToOne(() => Post, { nullable: true })
+  @JoinColumn({ name: 'post_id' })
+  posts!: Post;
 }

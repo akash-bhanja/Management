@@ -239,35 +239,35 @@ createState( @Query('name') name: string,
   }
 
 
-//   @Get('post/all')
-//   getAllPosts() {
-//     return this.addressService.getAllPosts();
-//   }
+  @Get('post/all')
+  getAllPosts() {
+    return this.addressService.getAllPosts();
+  }
 
-//   @Get('post/:id')
-//   getPostById(
-//     @Param('id') id: number,
-//   ) {
-//     return this.addressService.getPostById(id);
-//   }
+  @Get('post/:id')
+  getPostById(
+    @Param('id') id: number,
+  ) {
+    return this.addressService.getPostById(id);
+  }
 
-//   @Put('post/:id')
-//   updatePost(
-//     @Param('id') id: number,
-//     @Body() body: any,
-//   ) {
-//     return this.addressService.updatePost(
-//       id,
-//       body,
-//     );
-//   }
+  @Put('post/:id')
+  updatePost(
+    @Param('id') id: number,
+    @Body() body: any,
+  ) {
+    return this.addressService.updatePost(
+      id,
+      body,
+    );
+  }
 
-//   @Delete('post/:id')
-//   deletePost(
-//     @Param('id') id: number,
-//   ) {
-//     return this.addressService.deletePost(id);
-//   }
+  @Delete('post/:id')
+  deletePost(
+    @Param('id') id: number,
+  ) {
+    return this.addressService.deletePost(id);
+  }
 @ApiTags('Post')
    @Get('/details/pincode')
    @ApiQuery({  name: 'pin_code',  required: true,  example: '400001',})
@@ -288,12 +288,32 @@ createState( @Query('name') name: string,
     example: 'Mumbai Police Station',
     required: true,
   })
-
-
-
-
-  getPoliceStationsFullDetails(@Query('name') name: string) {
+    getPoliceStationsFullDetails(@Query('name') name: string) {
     return this.addressService.getPoliceStationsFullDetails(name);
   }
 
+  @ApiTags('UserAddress')
+  @Get('user/address')
+  @ApiQuery({
+    name: 'userName',
+    description: 'User name',
+    type: String,
+    example: 'John',
+    required: true,
+  })
+  getUserAddressByName(@Query('userName') userName: string) {
+    return this.addressService.getUserAddressByName(userName);
+  }
+  @ApiTags('Department')     
+  @Get('department/:name')
+  @ApiQuery({
+    name: 'name',
+    description: 'Department name',
+    type: String,
+    example: 'SD',
+    required: true,
+  })
+  async getUsersByDepartmentName(@Param('name') name: string) {
+  return this.addressService.getUsersByDepartmentName(name);
+}
 }

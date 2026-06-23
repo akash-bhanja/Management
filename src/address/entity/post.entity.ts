@@ -33,7 +33,7 @@ export class Post {
   @JoinColumn({ name: 'police_station_id' })
   police_station!: PoliceStation;
 
-   @OneToMany(() => User, (user) => user.post)
+  @OneToMany(() => User, (user: User) => user.posts)
   users!: User[];
 
   @Column({ length: 10, nullable: true })
