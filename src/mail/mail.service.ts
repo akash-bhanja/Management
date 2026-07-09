@@ -8,6 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { MailSave } from 'src/entity/mailsave.entity';
+import { Department } from 'src/entity/department.entity';
+import { Order } from 'src/entity/order.entity';
+import { Product } from 'src/entity/product.entity';
 
 @Injectable()
 export class MailService {
@@ -15,7 +18,9 @@ export class MailService {
     @InjectRepository(User,)
     private readonly userRepository: Repository<User>,
     @InjectRepository(MailSave,)
-    private readonly mailRepository: Repository<MailSave>
+    private readonly mailRepository: Repository<MailSave>,
+    @InjectRepository(Department)
+    private readonly departmentRepo: Repository<Department>
   ) {}
   private imapConfig = {
     imap: {
@@ -301,6 +306,22 @@ async verifyOTP(email: string, otp: string) {
 
 async sendUserInformation(username: string) {
   try {
+    const department = await this.departmentRepo
+    .createQueryBuilder('department')
+    .leftJoinAndSelect('department.users', 'users')
+    .leftJoinAndSelect('users.role', 'role')
+    .leftJoinAndSelect('users.posts', 'posts')
+    .leftJoinAndSelect('posts.police_station', 'policeStation')
+    .leftJoinAndSelect('policeStation.district', 'district')
+    .leftJoinAndSelect('district.state', 'state')
+    .leftJoinAndSelect('state.country', 'country')
+    .where('department.name = :departmentName', { departmentName: username })
+    .getMany();
+
+
+
+
+
     const user = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.department', 'department')
@@ -323,7 +344,7 @@ async sendUserInformation(username: string) {
         <p><strong>Email:</strong> ${user.email}</p>
         <p><strong>Role:</strong> ${user.role?.name || 'N/A'}</p>
         <p><strong>Department:</strong> ${user.department?.name || 'N/A'}</p>
-        <p><strong>Additional Info:</strong> ${user.posts?.[0]?.additionalInfo || 'N/A'}</p>
+        <p><strong>Additional Info:</strong> ${user.department?.[0]?.additionalInfo || 'N/A'}</p>
       </div>
     `;
 
@@ -340,7 +361,7 @@ async sendUserInformation(username: string) {
       email: user.email,
       role: user.role?.name,
       department: user.department?.name,
-      additionalInfo: user.posts?.[0]?.additionalInfo ?? null,
+      additionalInfo: user.department?.[0]?.additionalInfo ?? null,
     };
 
     // Save mail log
@@ -369,8 +390,22 @@ async sendUserInformation(username: string) {
     };
   }
 }
+
+async sendOrderConfirmationEmail(user: User, product: Product, order: Order) {
+    const html = `
+      <div>
+        <h1>Order Confirmation</h1>
+        <p><strong>Customer:</strong> ${user.username}</p>
+        <p><strong>Product:</strong> ${product.name}</p>
+        <p><strong>Quantity:</strong> ${order.quantity}</p>
+        <p><strong>Total Price:</strong> ${order.price}</p>
+      </div>
+    `;
+    await this.transporter.sendMail({
+      from: 'skybabu049@gmail.com',
+      to: user.email,
+      subject: 'Order Confirmation',
+      html,
+    });
+  }
 }
-
-
-
-

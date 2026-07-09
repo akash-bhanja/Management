@@ -1,12 +1,16 @@
-import {Entity,Column,PrimaryGeneratedColumn,ManyToOne,JoinColumn,OneToMany} from 'typeorm';
+import {Entity,Column,PrimaryGeneratedColumn,ManyToOne,JoinColumn,OneToMany, ManyToMany} from 'typeorm';
 import { Role } from './role.entity';
 import { Post } from 'src/address/entity/post.entity';
 import { Department } from './department.entity';
+import { Product } from './product.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @OneToMany(() => Product, (product) => product.user)
+  products!: Product[];
 
   @Column()
   username!: string;
@@ -28,4 +32,5 @@ export class User {
   @ManyToOne(() => Post, { nullable: true })
   @JoinColumn({ name: 'post_id' })
   posts!: Post;
+
 }

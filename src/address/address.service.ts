@@ -473,6 +473,7 @@ export class AddressService {
 
 
 async getUsersByDepartmentName(departmentName: string) {
+  
   const department = await this.departmentRepo
     .createQueryBuilder('department')
     .leftJoinAndSelect('department.users', 'users')
@@ -483,13 +484,32 @@ async getUsersByDepartmentName(departmentName: string) {
     .leftJoinAndSelect('district.state', 'state')
     .leftJoinAndSelect('state.country', 'country')
     .where('department.name = :departmentName', { departmentName })
-    .getOne();
-    
+    .getMany();
+
+
+
+    const usersData = department.map(dep => ({
+      department: dep.name,
+      users: dep.users.map(user => ({
+        username: user.username,
+        email: user.email,
+        role: dep.users.map(user => user.role?.name || 'N/A'),
+      })),
+      
+      posts: dep.users.map(user => ({
+        post_name: user.posts?.name || 'N/A',
+        police_station: user.posts?.police_station?.name || 'N/A',
+        district: user.posts?.police_station?.district?.name || 'N/A',
+        state: user.posts?.police_station?.district?.state?.name || 'N/A',
+        country: user.posts?.police_station?.district?.state?.country?.name || 'N/A',
+      })),
+    }));
 
   if (!department) {
     throw new NotFoundException('Department not found');
   }
 
-  return department;
+  return{users: usersData};
+
 }
 }

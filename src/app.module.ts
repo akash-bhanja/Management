@@ -16,6 +16,10 @@ import { PoliceStation } from './address/entity/police.entity';
 import { Post } from './address/entity/post.entity';
 import { Role } from './entity/role.entity';
 import { MailSave } from './entity/mailsave.entity';
+import { ProductModule } from './product/product.module';
+import { Product } from './entity/product.entity';
+import { Stock } from './entity/stock.entity';
+import { Order } from './entity/order.entity';
 
 
 @Module({
@@ -27,7 +31,7 @@ import { MailSave } from './entity/mailsave.entity';
       username: 'root',
       password: '',
       database: 'management',
-      entities: [Country, State, District, PoliceStation, Post, Department, Role, User, MailSave ],
+      entities: [Country, State, District, PoliceStation, Post, Department, Role, User, MailSave, Product, Stock, Order],
       synchronize: true, // ❗ Use false in production
     }),
 
@@ -40,6 +44,10 @@ import { MailSave } from './entity/mailsave.entity';
     MailModule,
 
     AddressModule,
+
+    ProductModule,
+
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

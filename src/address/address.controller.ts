@@ -313,7 +313,7 @@ createState( @Query('name') name: string,
     example: 'SD',
     required: true,
   })
-  async getUsersByDepartmentName(@Param('name') name: string) {
+  async getUsersByDepartmentName(@Query('name') name: string) {
   return this.addressService.getUsersByDepartmentName(name);
 }
 }
